@@ -69,7 +69,7 @@ class LauftrainingConverter {
         return $result;
     }
 
-        protected function recalculate($text, $module) {
+        public function recalculate($text, $module) {
 
         $text = str_replace('[loops]', (int)$module['log_loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
