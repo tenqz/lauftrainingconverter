@@ -3,6 +3,11 @@
 namespace Tenqz\LauftrainingConverter;
 
 class Converter {
+
+    const METERS = 'km';
+    const METERS_SECOND = 'min/km';
+    const SECONDS = 'h';
+
 	    protected function timeToFull($seconds, $speed = false) {
         $result = '';
 
