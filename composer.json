@@ -2,9 +2,7 @@
     "name": "tenqz/lauftrainingconverter",
     "description": "Convert training plan.",
     "version":"1.0.0",
-    "minimum-stability": "dev",
-    "prefer-stable" : true,
-    "licens":"proprietary",
+    "license":"MIT",
     "authors": [
  	{
 	    "name": "Alexey Kolchenko",
