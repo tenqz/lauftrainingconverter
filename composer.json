@@ -3,6 +3,7 @@
     "description": "Convert training plan.",
     "version":"1.0.0",
     "license":"MIT",
+    "minimum-stability": "dev",
     "authors": [
  	{
 	    "name": "Alexey Kolchenko",
