@@ -8,7 +8,13 @@ class Converter {
     const METERS_SECOND = 'min/km';
     const SECONDS = 'h';
 
-	    protected function timeToFull($seconds, $speed = false) {
+    protected $moduleVideos = [];
+
+    public function setModuleVideos($moduleVideos) {
+        $this->moduleVideos = $moduleVideos;
+    }
+
+    public function timeToFull($seconds, $speed = false) {
         $result = '';
 
         $hour = floor($seconds / 60 / 60);
@@ -29,7 +35,7 @@ class Converter {
         );
     }
 
-    protected function meterToFull(int $meters) {
+    public function meterToFull(int $meters) {
         if($meters > 1000) {
             $result = number_format (($meters/1000), 1, ',', ' ') . 'km';
         } else {
@@ -74,7 +80,7 @@ class Converter {
         return $result;
     }
 
-        public function recalculate($text, $module) {
+    public function recalculate($text, $module) {
 
         $text = str_replace('[loops]', (int)$module['log_loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
