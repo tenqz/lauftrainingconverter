@@ -1,6 +1,6 @@
 <?php
 
-namespace Belvg\LauftrainingConverter;
+namespace Tenqz\LauftrainingConverter;
 
 class LauftrainingConverter {
 	    protected function timeToFull($seconds, $speed = false) {
