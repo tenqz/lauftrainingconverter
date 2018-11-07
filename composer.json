@@ -12,7 +12,7 @@
  	{
             "name": "Oleg Patsay",
             "email": "oleg.p@belvg.com"
-        },
+        }
     ],
     "require": {
         "php": ">=5.4.0"
