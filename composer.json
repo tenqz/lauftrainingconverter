@@ -2,7 +2,8 @@
     "name": "tenqz/lauftrainingconverter",
     "description": "Convert training plan.",
     "version":"1.0.0",
-    "minimum-stability":"stable",
+    "minimum-stability": "dev",
+    "prefer-stable" : true,
     "licens":"proprietary",
     "authors": [
  	{
