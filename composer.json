@@ -1,6 +1,7 @@
 {
     "name": "tenqz/lauftrainingconverter",
     "description": "Convert training plan.",
+    "version":"1.0.0",
     "authors": [
         {
             "name": "Oleg Patsay",
