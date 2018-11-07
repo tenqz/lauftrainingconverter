@@ -2,7 +2,7 @@
 
 namespace Tenqz\LauftrainingConverter;
 
-class LauftrainingConverter {
+class Converter {
 	    protected function timeToFull($seconds, $speed = false) {
         $result = '';
 

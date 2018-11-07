@@ -2,11 +2,22 @@
     "name": "tenqz/lauftrainingconverter",
     "description": "Convert training plan.",
     "version":"1.0.0",
+    "minimum-stability":"stable",
+    "licens":"proprietary",
     "authors": [
-        {
+ 	{
+	    "name": "Alexey Kolchenko",
+            "email": "fiercemaverick@yandex.ru"   
+	},       
+ 	{
             "name": "Oleg Patsay",
             "email": "oleg.p@belvg.com"
-        }
+        },
     ],
-    "require": {}
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+    	"classmap": ["src"]
+    }
 }
