@@ -1,0 +1,11 @@
+{
+    "name": "belvg/lauftrainingconverter",
+    "description": "Convert training plan.",
+    "authors": [
+        {
+            "name": "Oleg Patsay",
+            "email": "oleg.p@belvg.com"
+        }
+    ],
+    "require": {}
+}
