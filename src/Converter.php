@@ -35,7 +35,26 @@ class Converter {
         );
     }
 
-    public function meterToFull(int $meters) {
+    /**
+     * @param string $time
+     * @return int
+     */
+    protected function fulltimeToSeconds($time) {
+        $result = 0;
+
+        if(preg_match('/^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/', $time)) {
+            $time = explode(":", $time);
+            $result = ((int)$time[0] * 3600) + ((int)$time[1] * 60) + (int)$time[2];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $meters
+     * @return string
+     */
+    public function meterToFull($meters) {
         if($meters > 1000) {
             $result = number_format (($meters/1000), 1, ',', ' ') . 'km';
         } else {
