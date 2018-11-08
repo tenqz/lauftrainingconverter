@@ -39,7 +39,7 @@ class Converter {
      * @param string $time
      * @return int
      */
-    protected function fulltimeToSeconds($time) {
+    protected function fulltimeToSeconds(string $time) {
         $result = 0;
 
         if(preg_match('/^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/', $time)) {
@@ -52,11 +52,13 @@ class Converter {
 
     /**
      * @param int $meters
+     * @param bool $onlykm
      * @return string
      */
-    public function meterToFull($meters) {
-        if($meters > 1000) {
-            $result = number_format (($meters/1000), 1, ',', ' ') . 'km';
+    public function meterToFull(int $meters, $onlykm = false) {
+        if($meters > 1000 || $onlykm) {
+            $result = number_format (($meters/1000), 1, ',', ' ')
+                 . (!$onlykm ? 'km' : '');
         } else {
             $result = $meters . 'm';
         }
