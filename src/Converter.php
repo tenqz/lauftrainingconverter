@@ -39,7 +39,7 @@ class Converter {
      * @param string $time
      * @return int
      */
-    protected function fulltimeToSeconds(string $time) {
+    public function fulltimeToSeconds(string $time) {
         $result = 0;
 
         if(preg_match('/^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/', $time)) {
