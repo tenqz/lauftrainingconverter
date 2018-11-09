@@ -14,7 +14,7 @@ class Converter {
         $this->moduleVideos = $moduleVideos;
     }
 
-    public function timeToFull($seconds, $speed = false) {
+    public function timeToFull($seconds, $speed = false, $showUnit = true) {
         $result = '';
 
         $hour = floor($seconds / 60 / 60);
@@ -31,7 +31,7 @@ class Converter {
         $result .= ($seconds < 10 ? '0' . $seconds : $seconds);
 
         return ($result === '00:00' ? '' : $result .
-            ($speed ? 'min/km' : ($hour < 1 ? ($minute > 0 ? 'm' : 's') : 'h'))
+            ($showUnit ? ($speed ? 'min/km' : ($hour < 1 ? ($minute > 0 ? 'm' : 's') : 'h')) : '')
         );
     }
 
