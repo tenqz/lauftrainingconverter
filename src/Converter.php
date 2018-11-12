@@ -66,6 +66,21 @@ class Converter {
         return $result;
     }
 
+    /**
+     * @param $km
+     * @return int
+     */
+    protected function kmToMeter($km) {
+        $meters = 0;
+
+        $km = str_replace(',', '.', $km);
+        if(preg_match('/^[0-9.]{4}$/', (float)$km)) {
+            $meters = (float)$km * 1000;
+        }
+
+        return (int)$meters;
+    }
+
     protected function cutFirstSymbol($currentEQ) {
         return substr($currentEQ, 1, strlen($currentEQ));
     }
