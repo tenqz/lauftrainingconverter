@@ -70,7 +70,7 @@ class Converter {
      * @param $km
      * @return int
      */
-    protected function kmToMeter($km) {
+    public function kmToMeter($km) {
         $meters = 0;
 
         $km = str_replace(',', '.', $km);
