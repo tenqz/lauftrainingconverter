@@ -14,7 +14,7 @@ class Converter {
         $this->moduleVideos = $moduleVideos;
     }
 
-    public function timeToFull($seconds, $speed = false) {
+    public function timeToFull($seconds, $speed = false, $showUnit = true) {
         $result = '';
 
         $hour = floor($seconds / 60 / 60);
@@ -31,18 +31,54 @@ class Converter {
         $result .= ($seconds < 10 ? '0' . $seconds : $seconds);
 
         return ($result === '00:00' ? '' : $result .
-            ($speed ? 'min/km' : ($hour < 1 ? ($minute > 0 ? 'm' : 's') : 'h'))
+            ($showUnit ? ($speed ? 'min/km' : ($hour < 1 ? ($minute > 0 ? 'm' : 's') : 'h')) : '')
         );
     }
 
-    public function meterToFull(int $meters) {
-        if($meters > 1000) {
-            $result = number_format (($meters/1000), 1, ',', ' ') . 'km';
+    /**
+     * @param string $time
+     * @return int
+     */
+    public function fulltimeToSeconds(string $time) {
+        $result = 0;
+
+        if(preg_match('/^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/', $time)) {
+            $time = explode(":", $time);
+            $result = ((int)$time[0] * 3600) + ((int)$time[1] * 60) + (int)$time[2];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $meters
+     * @param bool $onlykm
+     * @return string
+     */
+    public function meterToFull(int $meters, $onlykm = false) {
+        if($meters > 1000 || $onlykm) {
+            $result = number_format (($meters/1000), 1, ',', ' ')
+                 . (!$onlykm ? 'km' : '');
         } else {
             $result = $meters . 'm';
         }
 
         return $result;
+    }
+
+    /**
+     * @param $km
+     * @return int
+     */
+    public function kmToMeter($km) {
+        $meters = 0;
+
+        $km = str_replace(',', '.', $km);
+        if(preg_match('/^[0-9.]{4}$/', (float)$km)) {
+            $meters = (float)$km * 1000;
+        }
+
+        return (int)$meters;
     }
 
     protected function cutFirstSymbol($currentEQ) {
@@ -129,7 +165,7 @@ class Converter {
 
                         try {
                             if(!preg_match('/^return\s[0-9()-+*\/.\s]{1,}\;$/', $currentEQ))
-                                throw new Exception('EQ is error');
+                                throw new \Exception('EQ is error');
                             $resultEQ = eval($currentEQ);
                             if($unit['unit'] === self::METERS_SECOND) {
                                 $resultEQ = $resultEQ * 1000 / 60;
