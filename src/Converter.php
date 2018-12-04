@@ -116,7 +116,8 @@ class Converter {
         return $result;
     }
 
-    public function recalculate($text, $module) {
+    public function recalculate($text, $module) 
+    {
 
         $text = str_replace('[loops]', (int)$module['log_loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
@@ -194,7 +195,11 @@ class Converter {
         return $result;
     }
 
-        public function recalculateFront($text, $module) {
+        public function recalculateFront($text, $module) 
+        {
+
+        $beforeText =  stristr($text, "in", true);              
+        $text = str_replace($beforeText, "<strong>".$beforeText."</strong>", $text);
         $text = str_replace('[loops]', (int)$module['loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
