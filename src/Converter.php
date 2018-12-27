@@ -230,7 +230,9 @@ class Converter {
 
         public function recalculateFront($text, $module) 
         {
-
+            if(preg_match('/\[coach\]/', $text)) {
+                return '';
+            }
             $beforeText =  stristr($text, "in", true);              
             $text = str_replace($beforeText, "<strong>".$beforeText."</strong>", $text);
             $text = str_replace('[loops]', (int)$module['loops'], $text);
