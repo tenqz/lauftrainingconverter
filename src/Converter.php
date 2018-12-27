@@ -37,6 +37,32 @@ class Converter {
             );
         }
 
+         public function timeToFullStats($seconds, $speed = false, $showUnit = true)
+         {
+            $result = '';
+            if ($seconds == 0) {
+                $result = "00:00:00h";
+                return $result;
+            }
+
+            $hour = floor($seconds / 60 / 60);
+            $seconds -= $hour * 60 * 60;
+            if($hour > 0) {
+                $result = ($hour < 10 ? '0' . $hour : $hour) . ':';
+            }
+
+            $minute = floor($seconds / 60);
+            $seconds -= $minute * 60;
+            $result .= ($minute < 10 ? '0' . $minute : $minute) . ':';
+
+            $seconds = floor($seconds);
+            $result .= ($seconds < 10 ? '0' . $seconds : $seconds);
+
+            return ($result === '00:00' ? '' : $result .
+                ($showUnit ? ($speed ? 'min/km' : ($hour < 1 ? ($minute > 0 ? 'm' : 's') : 'h')) : '')
+            );
+         }
+
         /**
          * @param string $time
          * @return int
