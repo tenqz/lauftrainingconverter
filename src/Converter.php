@@ -105,7 +105,7 @@ class Converter {
             $meters = 0;
 
             $km = str_replace(',', '.', $km);
-            if(preg_match('/^[0-9.]{4}$/', (float)$km)) {
+            if(preg_match('/^[0-9.]{1,5}$/', (float)$km)) {
                 $meters = (float)$km * 1000;
             }
 
