@@ -134,8 +134,9 @@ class Converter {
         return $result;
     }
 
-    public function recalculate(string $text, $module) :string
+    public function recalculate($text, $module) :string
     {
+        if(!$text) return '';
         $text = str_replace('[loops]', (int)$module['log_loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
