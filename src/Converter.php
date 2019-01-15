@@ -4,11 +4,11 @@ namespace Tenqz\LauftrainingConverter;
 
 class Converter {
 
-    const KMETERS = 'km';
-    const METERS = 'm';
-    const METERS_SECOND = 'min/km';
-    const SECONDS = 's';
-    const HOURS = 'h';
+    const KMETERS = ' km';
+    const METERS = ' m';
+    const METERS_SECOND = ' min/km';
+    const SECONDS = ' s';
+    const HOURS = ' h';
 
     protected $moduleVideos = [];
 
