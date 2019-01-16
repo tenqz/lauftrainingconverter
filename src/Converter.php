@@ -216,7 +216,14 @@ class Converter {
         if(preg_match('/\[coach\]/', $text)) {
             return '';
         }
-        $beforeText =  stristr($text, "in", true);
+
+        if ($module['info']['typename'] == 'WK') {
+            $beforeText = $text;
+        } else {
+            $index = stripos($text, $module['info']['fullname']);
+            $beforeText = substr($text, 0, $index+strlen($module['info']['fullname']));
+        }
+
         $text = str_replace($beforeText, "<strong>".$beforeText."</strong>", $text);
         $text = str_replace('[loops]', (int)$module['loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
