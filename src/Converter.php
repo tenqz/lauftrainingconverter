@@ -217,7 +217,7 @@ class Converter {
         if(preg_match('/\[coach\]/', $text)) {
             return '';
         }
-        $text = $this->wrapInFat($text, $module['info']['fullname']);
+        $text = $this->wrapInFat($text, $module);
         $text = $this->recalculateCode($text, $module);
         return $text;
     }
@@ -241,16 +241,25 @@ class Converter {
         return $matches[0];
     }
 
-    protected function wrapInFat($text, $modulename)
+    protected function wrapInFat($text, $module)
     {
-        if ($modulename == 'WK') {
-            $result = $text;
-        } else {
-            $index = stripos($text, $modulename);
-            $result = substr($text, 0, $index+strlen($modulename));
+        switch ($module['info']['typename']) {
+            case "WK":
+                $search = $text;
+                break;
+            case "RDL":
+                $search = "reg. Dauerlauf";
+                break;
+            case "RDLt":
+                $search = "reg. Dauerlauf";
+                break;
+            default:
+                $search = $module['info']['fullname'];
+            break;
         }
+        $index = stripos($text, $search);
+        $result = substr($text, 0, $index+strlen($search));
         $text = str_replace($result, "<strong>".$result."</strong>", $text);
-
         return $text;
     }
 
