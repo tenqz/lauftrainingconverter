@@ -4,11 +4,12 @@ namespace Tenqz\LauftrainingConverter;
 
 class Converter {
 
-    const KMETERS = ' km';
-    const METERS = ' m';
-    const METERS_SECOND = ' min/km';
-    const SECONDS = ' s';
-    const HOURS = ' h';
+    const KMETERS = 'km';
+    const METERS = 'm';
+    const MINUTES = 'min';
+    const METERS_SECOND = 'min/km';
+    const SECONDS = 's';
+    const HOURS = 'h';
 
     protected $moduleVideos = [];
 
@@ -43,7 +44,7 @@ class Converter {
                     ($speed ?
                         self::METERS_SECOND :
                         ($hour < 1 ?
-                            ($minute > 0 ? self::METERS : self::SECONDS) :
+                            ($minute > 0 ? self::MINUTES : self::SECONDS) :
                             self::HOURS
                         )
                     ) :
@@ -217,14 +218,8 @@ class Converter {
             return '';
         }
 
-        if ($module['info']['typename'] == 'WK') {
-            $beforeText = $text;
-        } else {
-            $index = stripos($text, $module['info']['fullname']);
-            $beforeText = substr($text, 0, $index+strlen($module['info']['fullname']));
-        }
+        $text = $this->wrapInFat($text, $module['info']['fullname']);
 
-        $text = str_replace($beforeText, "<strong>".$beforeText."</strong>", $text);
         $text = str_replace('[loops]', (int)$module['loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
@@ -457,5 +452,18 @@ class Converter {
     {
         preg_match_all('/(\[[a-z]+[0-9]?+.?\])/', $text, $matches);
         return $matches[0];
+    }
+
+    protected function wrapInFat($text, $modulename)
+    {
+        if ($modulename == 'WK') {
+            $result = $text;
+        } else {
+            $index = stripos($text, $modulename);
+            $result = substr($text, 0, $index+strlen($modulename));
+        }
+        $text = str_replace($result, "<strong>".$result."</strong>", $text);
+
+        return $text;
     }
 }
