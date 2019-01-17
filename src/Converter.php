@@ -40,7 +40,7 @@ class Converter {
         return (
             ($result === '00:00' || $result === '00:00:00') ?
                 '' :
-                $result . ($showUnit ?
+                $result . " ". ($showUnit ?
                     ($speed ?
                         self::METERS_SECOND :
                         ($hour < 1 ?
@@ -78,9 +78,9 @@ class Converter {
     {
         if($meters > 1000 || $onlykm) {
             $result = number_format (($meters/1000), 1, ',', ' ')
-                 . (!$onlykm ? self::KMETERS : '');
+                 ." ". (!$onlykm ? self::KMETERS : '');
         } else {
-            $result = $meters . self::METERS;
+            $result = $meters . " ". self::METERS;
         }
 
         return $result;
@@ -217,233 +217,20 @@ class Converter {
         if(preg_match('/\[coach\]/', $text)) {
             return '';
         }
-
         $text = $this->wrapInFat($text, $module['info']['fullname']);
-
-        $text = str_replace('[loops]', (int)$module['loops'], $text);
-        $text = str_replace('[txt]', $module['text'], $text);
-        $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
-
-        if(preg_match('/\[dur1V\]/', $text)) {
-            $text = str_replace('[dur1V]', $this->timeToFull($module['dur_1'], true), $text);
-        } else {
-            $text = str_replace('[dur1]', $this->timeToFull($module['dur_1']), $text);
-        }
-        if(preg_match('/\[dur2V\]/', $text)) {
-            $text = str_replace('[dur2V]', $this->timeToFull($module['dur_2'], true), $text);
-        } else {
-            $text = str_replace('[dur2]', $this->timeToFull($module['dur_2']), $text);
-        }
-        if(preg_match('/\[dur3V\]/', $text)) {
-            $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
-        } else {
-            $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
-        }
-
-        $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
-        $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
-        $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
-
-        if(preg_match('/\[\=/', $text)) {
-            preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
-            if($equation) {
-                foreach($equation as $eq) {
-                    $unitMeter = '';
-                    if(isset($eq[1]) && $eq[1]) {
-                        $currentEQ = $eq[1];
-
-                        $unit = $this->getUnit($currentEQ);
-                        $currentEQ = $unit['obj'];
-
-                        $currentEQ = str_replace('loops', (int)$module['loops'], $currentEQ);
-
-                        $currentEQ = str_replace('dis1', $module['dist_1'], $currentEQ);
-                        $currentEQ = str_replace('dis2', $module['dist_2'], $currentEQ);
-                        $currentEQ = str_replace('dis3', $module['dist_3'], $currentEQ);
-                        $currentEQ = str_replace('dur1', $module['dur_1'], $currentEQ);
-                        $currentEQ = str_replace('dur2', $module['dur_2'], $currentEQ);
-                        $currentEQ = str_replace('dur3', $module['dur_3'], $currentEQ);
-                        $currentEQ = 'return ' . $currentEQ . ';';
-
-                        try {
-                            if(!preg_match('/^return\s[0-9()-+*\/.\s]{1,}\;$/', $currentEQ))
-                                throw new \Exception('EQ is error');
-                            $resultEQ = eval($currentEQ);
-                            if($unit['unit'] === self::METERS_SECOND) {
-                                $resultEQ = $resultEQ * 1000 / 60;
-                                $unitMeter = self::METERS_SECOND;
-                            }
-                            if($unit['unit'] === self::KMETERS) {
-                                $resultEQ = $resultEQ / 1000;
-                                $unitMeter = self::KMETERS;
-                            }
-                            if($unit['unit'] === self::HOURS) {
-                                $resultEQ = $this->timeToFull($resultEQ);
-                            }
-                            $resultEQ = number_format(ceil($resultEQ * 100) / 100, 2);
-                        } catch(\Exception $e) {
-                            $resultEQ = 0;
-                        }
-
-                        $text = preg_replace('/(\[=.*?\])/', $resultEQ . '&nbsp;' . $unitMeter, $text, 1);
-                    }
-                }
-            }
-        }
+        $text = $this->recalculateCode($text, $module);
         return $text;
     }
 
     public function recalculateBackDiary($text, $module)
     {
-
-        $beforeText =  stristr($text, "in", true);
-        $text = str_replace('[loops]', (int)$module['loops'], $text);
-        $text = str_replace('[txt]', $module['text'], $text);
-        $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
-
-        if(preg_match('/\[dur1V\]/', $text)) {
-            $text = str_replace('[dur1V]', $this->timeToFull($module['dur_1'], true), $text);
-        } else {
-            $text = str_replace('[dur1]', $this->timeToFull($module['dur_1']), $text);
-        }
-        if(preg_match('/\[dur2V\]/', $text)) {
-            $text = str_replace('[dur2V]', $this->timeToFull($module['dur_2'], true), $text);
-        } else {
-            $text = str_replace('[dur2]', $this->timeToFull($module['dur_2']), $text);
-        }
-        if(preg_match('/\[dur3V\]/', $text)) {
-            $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
-        } else {
-            $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
-        }
-
-        $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
-        $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
-        $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
-
-        if(preg_match('/\[\=/', $text)) {
-            preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
-            if($equation) {
-                foreach($equation as $eq) {
-                    $unitMeter = '';
-                    if(isset($eq[1]) && $eq[1]) {
-                        $currentEQ = $eq[1];
-
-                        $unit = $this->getUnit($currentEQ);
-                        $currentEQ = $unit['obj'];
-
-                        $currentEQ = str_replace('loops', (int)$module['loops'], $currentEQ);
-
-                        $currentEQ = str_replace('dis1', $module['dist_1'], $currentEQ);
-                        $currentEQ = str_replace('dis2', $module['dist_2'], $currentEQ);
-                        $currentEQ = str_replace('dis3', $module['dist_3'], $currentEQ);
-                        $currentEQ = str_replace('dur1', $module['dur_1'], $currentEQ);
-                        $currentEQ = str_replace('dur2', $module['dur_2'], $currentEQ);
-                        $currentEQ = str_replace('dur3', $module['dur_3'], $currentEQ);
-                        $currentEQ = 'return ' . $currentEQ . ';';
-
-                        try {
-                            if(!preg_match('/^return\s[0-9()-+*\/.\s]{1,}\;$/', $currentEQ))
-                                throw new \Exception('EQ is error');
-                            $resultEQ = eval($currentEQ);
-                            if($unit['unit'] === self::METERS_SECOND) {
-                                $resultEQ = $resultEQ * 1000 / 60;
-                                $unitMeter = self::METERS_SECOND;
-                            }
-                            if($unit['unit'] === self::KMETERS) {
-                                $resultEQ = $resultEQ / 1000;
-                                $unitMeter = self::KMETERS;
-                            }
-                            if($unit['unit'] === self::HOURS) {
-                                $resultEQ = $this->timeToFull($resultEQ);
-                            }
-                            $resultEQ = number_format(ceil($resultEQ * 100) / 100, 2);
-                        } catch(\Exception $e) {
-                            $resultEQ = 0;
-                        }
-
-                        $text = preg_replace('/(\[=.*?\])/', $resultEQ . '&nbsp;' . $unitMeter, $text, 1);
-                    }
-                }
-            }
-        }
+        $text = $this->recalculateCode($text, $module);
         return $text;
     }
 
     public function recalculateFrontDiary($text, $module)
     {
-
-        $text = str_replace('[loops]', (int)$module['log_loops'], $text);
-        $text = str_replace('[txt]', $module['text'], $text);
-        $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
-
-        if(preg_match('/\[dur1V\]/', $text)) {
-            $text = str_replace('[dur1V]', $this->timeToFull($module['log_dur_1'], true), $text);
-        } else {
-            $text = str_replace('[dur1]', $this->timeToFull($module['log_dur_1']), $text);
-        }
-        if(preg_match('/\[dur2V\]/', $text)) {
-            $text = str_replace('[dur2V]', $this->timeToFull($module['log_dur_2'], true), $text);
-        } else {
-            $text = str_replace('[dur2]', $this->timeToFull($module['log_dur_2']), $text);
-        }
-        if(preg_match('/\[dur3V\]/', $text)) {
-            $text = str_replace('[dur3V]', $this->timeToFull($module['log_dur_3'], true), $text);
-        } else {
-            $text = str_replace('[dur3]', $this->timeToFull($module['log_dur_3']), $text);
-        }
-
-        $text = str_replace('[dis1]', $this->meterToFull($module['log_dist_1']), $text);
-        $text = str_replace('[dis2]', $this->meterToFull($module['log_dist_2']), $text);
-        $text = str_replace('[dis3]', $this->meterToFull($module['log_dist_3']), $text);
-
-        if(preg_match('/\[\=/', $text)) {
-            preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
-            if($equation) {
-                foreach($equation as $eq) {
-                    $unitMeter = '';
-                    if(isset($eq[1]) && $eq[1]) {
-                        $currentEQ = $eq[1];
-
-                        $unit = $this->getUnit($currentEQ);
-                        $currentEQ = $unit['obj'];
-
-                        $currentEQ = str_replace('loops', (int)$module['log_loops'], $currentEQ);
-
-                        $currentEQ = str_replace('dis1', $module['log_dist_1'], $currentEQ);
-                        $currentEQ = str_replace('dis2', $module['log_dist_2'], $currentEQ);
-                        $currentEQ = str_replace('dis3', $module['log_dist_3'], $currentEQ);
-                        $currentEQ = str_replace('dur1', $module['log_dur_1'], $currentEQ);
-                        $currentEQ = str_replace('dur2', $module['log_dur_2'], $currentEQ);
-                        $currentEQ = str_replace('dur3', $module['log_dur_3'], $currentEQ);
-                        $currentEQ = 'return ' . $currentEQ . ';';
-
-                        try {
-                            if(!preg_match('/^return\s[0-9()-+*\/.\s]{1,}\;$/', $currentEQ))
-                                throw new \Exception('EQ is error');
-                            $resultEQ = eval($currentEQ);
-                            if($unit['unit'] === self::METERS_SECOND) {
-                                $resultEQ = $resultEQ * 1000 / 60;
-                                $unitMeter = self::METERS_SECOND;
-                            }
-                            if($unit['unit'] === self::KMETERS) {
-                                $resultEQ = $resultEQ / 1000;
-                                $unitMeter = self::KMETERS;
-                            }
-                            if($unit['unit'] === self::HOURS) {
-                                $resultEQ = $this->timeToFull($resultEQ);
-                            }
-                            $resultEQ = number_format(ceil($resultEQ * 100) / 100, 2);
-                        } catch(\Exception $e) {
-                            $resultEQ = 0;
-                        }
-
-                        $text = preg_replace('/(\[=.*?\])/', $resultEQ . '&nbsp;' . $unitMeter, $text, 1);
-                    }
-                }
-            }
-        }
-
+        $text = $this->recalculate($text, $module);
         return $text;
     }
 
@@ -464,6 +251,82 @@ class Converter {
         }
         $text = str_replace($result, "<strong>".$result."</strong>", $text);
 
+        return $text;
+    }
+
+    protected function recalculateCode($text, $module)
+    {
+        $space = " ";
+        $text = str_replace('[loops]', (int)$module['loops'], $text);
+        $text = str_replace('[txt]', $module['text'], $text);
+        $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
+
+        if(preg_match('/\[dur1V\]/', $text)) {
+            $text = str_replace('[dur1V]', $this->timeToFull($module['dur_1'], true), $text);
+        } else {
+            $text = str_replace('[dur1]', $this->timeToFull($module['dur_1']), $text);
+        }
+        if(preg_match('/\[dur2V\]/', $text)) {
+            $text = str_replace('[dur2V]', $this->timeToFull($module['dur_2'], true), $text);
+        } else {
+            $text = str_replace('[dur2]', $this->timeToFull($module['dur_2']), $text);
+        }
+        if(preg_match('/\[dur3V\]/', $text)) {
+            $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
+        } else {
+            $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
+        }
+
+        $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
+        $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
+        $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
+
+        if(preg_match('/\[\=/', $text)) {
+            preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
+            if($equation) {
+                foreach($equation as $eq) {
+                    $unitMeter = '';
+                    if(isset($eq[1]) && $eq[1]) {
+                        $currentEQ = $eq[1];
+
+                        $unit = $this->getUnit($currentEQ);
+                        $currentEQ = $unit['obj'];
+
+                        $currentEQ = str_replace('loops', (int)$module['loops'], $currentEQ);
+
+                        $currentEQ = str_replace('dis1', $module['dist_1'], $currentEQ);
+                        $currentEQ = str_replace('dis2', $module['dist_2'], $currentEQ);
+                        $currentEQ = str_replace('dis3', $module['dist_3'], $currentEQ);
+                        $currentEQ = str_replace('dur1', $module['dur_1'], $currentEQ);
+                        $currentEQ = str_replace('dur2', $module['dur_2'], $currentEQ);
+                        $currentEQ = str_replace('dur3', $module['dur_3'], $currentEQ);
+                        $currentEQ = 'return ' . $currentEQ . ';';
+
+                        try {
+                            if(!preg_match('/^return\s[0-9()-+*\/.\s]{1,}\;$/', $currentEQ))
+                                throw new \Exception('EQ is error');
+                            $resultEQ = eval($currentEQ);
+                            if($unit['unit'] === self::METERS_SECOND) {
+                                $resultEQ = $resultEQ * 1000 / 60;
+                                $unitMeter = self::METERS_SECOND;
+                            }
+                            if($unit['unit'] === self::KMETERS) {
+                                $resultEQ = $resultEQ / 1000;
+                                $unitMeter = self::KMETERS;
+                            }
+                            if($unit['unit'] === self::HOURS) {
+                                $resultEQ = $this->timeToFull($resultEQ);
+                            }
+                            $resultEQ = number_format(ceil($resultEQ * 100) / 100, 2);
+                        } catch(\Exception $e) {
+                            $resultEQ = 0;
+                        }
+
+                        $text = preg_replace('/(\[=.*?\])/', $resultEQ . '&nbsp;' . $unitMeter, $text, 1);
+                    }
+                }
+            }
+        }
         return $text;
     }
 }
