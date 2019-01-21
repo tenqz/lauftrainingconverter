@@ -65,6 +65,7 @@ class Converter {
     public function fulltimeToSeconds(string $time) : int
     {
         $result = 0;
+        $time = trim($time);
 
         if(preg_match('/^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/', $time)) {
             $time = explode(":", $time);
