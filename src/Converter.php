@@ -243,23 +243,23 @@ class Converter {
 
     protected function wrapInFat($text, $module)
     {
-        switch ($module['info']['typename']) {
-            case "WK":
-                $search = $text;
-                break;
-            case "RDL":
-                $search = "reg. Dauerlauf";
-                break;
-            case "RDLt":
-                $search = "reg. Dauerlauf";
-                break;
-            default:
-                $search = $module['info']['fullname'];
-            break;
-        }
-        $index = stripos($text, $search);
-        $result = substr($text, 0, $index+strlen($search));
-        $text = str_replace($result, "<strong>".$result."</strong>", $text);
+        // switch ($module['info']['typename']) {
+        //     case "WK":
+        //         $search = $text;
+        //         break;
+        //     case "RDL":
+        //         $search = "reg. Dauerlauf";
+        //         break;
+        //     case "RDLt":
+        //         $search = "reg. Dauerlauf";
+        //         break;
+        //     default:
+        //         $search = $module['info']['fullname'];
+        //     break;
+        // }
+        // $index = stripos($text, $search);
+        // $result = substr($text, 0, $index+strlen($search));
+        // $text = str_replace($result, "<strong>".$result."</strong>", $text);
         return $text;
     }
 
