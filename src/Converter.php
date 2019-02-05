@@ -215,10 +215,7 @@ class Converter {
 
     public function recalculateFront($text, $module)
     {
-        if(preg_match('/\[coach\]/', $text)) {
-            return '';
-        }
-        $text = $this->wrapInFat($text, $module);
+//        $text = $this->wrapInFat($text, $module);
         $text = $this->recalculateCode($text, $module);
         return $text;
     }
@@ -268,28 +265,30 @@ class Converter {
     {
         $space = " ";
         $text = str_replace('[loops]', (int)$module['loops'], $text);
+
         $text = str_replace('[txt]', $module['text'], $text);
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
 
-        if(preg_match('/\[dur1V\]/', $text)) {
-            $text = str_replace('[dur1V]', $this->timeToFull($module['dur_1'], true), $text);
-        } else {
-            $text = str_replace('[dur1]', $this->timeToFull($module['dur_1']), $text);
-        }
-        if(preg_match('/\[dur2V\]/', $text)) {
-            $text = str_replace('[dur2V]', $this->timeToFull($module['dur_2'], true), $text);
-        } else {
-            $text = str_replace('[dur2]', $this->timeToFull($module['dur_2']), $text);
-        }
-        if(preg_match('/\[dur3V\]/', $text)) {
-            $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
-        } else {
-            $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
-        }
-
+        // distantion
         $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
         $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
         $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
+
+        // time
+        $text = str_replace('[dur1]', $this->timeToFull($module['dur_1']), $text);
+        $text = str_replace('[dur2]', $this->timeToFull($module['dur_2']), $text);
+        $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
+
+
+        if(preg_match('/\[dur1V\]/', $text)) {
+            $text = str_replace('[dur1V]', $this->timeToFull($module['dur_1'], true), $text);
+        }
+        if(preg_match('/\[dur2V\]/', $text)) {
+            $text = str_replace('[dur2V]', $this->timeToFull($module['dur_2'], true), $text);
+        }
+        if(preg_match('/\[dur3V\]/', $text)) {
+            $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
+        }
 
         if(preg_match('/\[\=/', $text)) {
             preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
