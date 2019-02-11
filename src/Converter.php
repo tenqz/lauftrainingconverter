@@ -338,4 +338,102 @@ class Converter {
         }
         return $text;
     }
+
+    /**
+     * Array $data must to contain keys:
+     * array(
+     *      'dist_1',
+     *      'dist_2',
+     *      'dist_3',
+     *      'dur_1',
+     *      'loops',
+     *      'rztime',
+     *      'pace1',
+     *      'pace2',
+     *      'typename'
+     * )
+     *
+     * Array $modifier must to contain keys:
+     * array(
+     *      'factor',
+     *      'round',
+     *      'children' => 'not require'
+     * )
+     * @param array $modifier
+     * @param array $data
+     * @param array $modifier2
+     * @return array seconds/km
+     */
+    public function getPace(array $modifier, array $data, $modifier2 = []) {
+        $pace1 = $data['pace1'] / 1000; //seconds/km to seconds/meter
+        $pace2 = $data['pace2'] / 1000;
+        $totalPace1 = 0;
+        $totalPace2 = 0;
+
+        if($data['dist_1'] && $data['dur_1']) {
+            $average = $data['dur_1'] / $data['dist_1'];
+
+            if($data['typename'] === 'TWK' || $data['typename'] === 'TWKi' && $modifier2) {
+                if($data['dist_2'] && $data['dist_3'] && ($pace1 || $pace2)) {
+                    $koif = ceil($data['dist_1'] / ($data['dist_2'] + $data['dist_3']));
+                    $distancePace1 = $koif;
+                    $distancePace2 = $koif;
+                    $rest = $data['dist_1'] - (($data['dist_2'] + $data['dist_3']) * $koif);
+                    $distancePace1 += $rest / $data['dist_2'];
+                    if($rest > $data['dist_2']) {
+                        $distancePace2 += ($rest - $data['dist_2']) / $data['dist_3'];
+                    }
+                    if($pace1) {
+                        $distance1 = $distancePace1 * $data['dist_2'];
+                        $pace2 = ($data['dur_1'] - ($distance1 * $pace1)) / ($data['dist_1'] - $distance1);
+                    } else {
+                        $distance2 = $distancePace2 * $data['dist_3'];
+                        $pace1 = ($data['dur_1'] - ($distance2 * $pace2)) / ($data['dist_1'] - $distance2);
+                    }
+                }
+            } elseif(($data['typename'] === 'CSD' || $data['typename'] === 'CSDi') && $modifier2) {
+                if($pace1 || $pace2) {
+                    if($pace1) $pace2 = $average * 2 - $pace1;
+                    if($pace2) $pace1 = $average * 2 - $pace2;
+                } else {
+                    $totalPace1 = ($average * 1000) + 30;
+                    $totalPace2 = ($average * 1000) - 30;
+                }
+            } elseif(!$pace1) {
+                $pace1 = $average;
+            }
+        } else {
+            if(!$data['rztime']) $data['rztime'] = 2700; //45 min
+            $alldistance = (int)$data['dist_1'] * (int)$data['loops'];
+
+            if(!$pace1) {
+                $factor = $modifier['factor'];
+                $round = $modifier['round'];
+                if (isset($modifier['children']) && $alldistance > 0) {
+                    foreach ($modifier['children'] as $minDistance => $child) {
+                        if ($alldistance >= $minDistance) {
+                            $factor = $child['factor'];
+                            $round = $child['round'];
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                $totalPace1 = round(($data['rztime'] * $factor) / $round) * $round;
+            }
+            if(!$pace2 && $modifier2) {
+                $factor = $modifier2['factor'];
+                $round = $modifier2['round'];
+                $totalPace2 = round(($data['rztime'] * $factor) / $round) * $round;
+            }
+        }
+
+        if(!$totalPace1) $totalPace1 = $pace1 * 1000;
+        if(!$totalPace2) $totalPace2 = $pace2 * 1000;
+
+        return [
+            'pace1' => (int)$totalPace1,
+            'pace2' => (int)$totalPace2
+        ];
+    }
 }
