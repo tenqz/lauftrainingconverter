@@ -158,6 +158,16 @@ class Converter {
         } else {
             $text = str_replace('[dur3]', $this->timeToFull($module['log_dur_3']), $text);
         }
+        if(preg_match('/\[paceV\]/', $text)) {
+            $text = str_replace('[paceV]', $this->timeToFull($module['log_pace1'], true), $text);
+        } else {
+            $text = str_replace('[pace]', $this->timeToFull($module['log_pace1']), $text);
+        }
+        if(preg_match('/\[pace2V\]/', $text)) {
+            $text = str_replace('[pace2V]', $this->timeToFull($module['log_pace2'], true), $text);
+        } else {
+            $text = str_replace('[pace2]', $this->timeToFull($module['log_pace2']), $text);
+        }
 
         $text = str_replace('[dis1]', $this->meterToFull($module['log_dist_1']), $text);
         $text = str_replace('[dis2]', $this->meterToFull($module['log_dist_2']), $text);
@@ -288,6 +298,12 @@ class Converter {
         }
         if(preg_match('/\[dur3V\]/', $text)) {
             $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
+        }
+        if(preg_match('/\[paceV\]/', $text)) {
+            $text = str_replace('[paceV]', $this->timeToFull($module['pace1'], true), $text);
+        }
+        if(preg_match('/\[pace2V\]/', $text)) {
+            $text = str_replace('[pace2V]', $this->timeToFull($module['pace2'], true), $text);
         }
 
         if(preg_match('/\[\=/', $text)) {
