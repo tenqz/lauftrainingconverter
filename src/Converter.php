@@ -36,10 +36,9 @@ class Converter {
         $result[] = ($seconds < 10 ? '0' : '') . $seconds;
 
         $result = implode(':', $result);
-        return $result;
         return (
             ($result === '00:00' || $result === '00:00:00') ?
-                '' :
+                $result :
                 $result . " ". ($showUnit ?
                     ($speed ?
                         self::METERS_SECOND :
