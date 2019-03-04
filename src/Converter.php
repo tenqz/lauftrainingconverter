@@ -36,6 +36,7 @@ class Converter {
         $result[] = ($seconds < 10 ? '0' : '') . $seconds;
 
         $result = implode(':', $result);
+        return $result;
         return (
             ($result === '00:00' || $result === '00:00:00') ?
                 '' :
@@ -143,29 +144,29 @@ class Converter {
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
 
         if(preg_match('/\[dur1V\]/', $text)) {
-            $text = str_replace('[dur1V]', $this->timeToFullStats($module['log_dur_1'], true), $text);
+            $text = str_replace('[dur1V]', $this->timeToFull($module['log_dur_1'], true), $text);
         } else {
-            $text = str_replace('[dur1]', $this->timeToFullStats($module['log_dur_1']), $text);
+            $text = str_replace('[dur1]', $this->timeToFull($module['log_dur_1']), $text);
         }
         if(preg_match('/\[dur2V\]/', $text)) {
-            $text = str_replace('[dur2V]', $this->timeToFullStats($module['log_dur_2'], true), $text);
+            $text = str_replace('[dur2V]', $this->timeToFull($module['log_dur_2'], true), $text);
         } else {
-            $text = str_replace('[dur2]', $this->timeToFullStats($module['log_dur_2']), $text);
+            $text = str_replace('[dur2]', $this->timeToFull($module['log_dur_2']), $text);
         }
         if(preg_match('/\[dur3V\]/', $text)) {
-            $text = str_replace('[dur3V]', $this->timeToFullStats($module['log_dur_3'], true), $text);
+            $text = str_replace('[dur3V]', $this->timeToFull($module['log_dur_3'], true), $text);
         } else {
-            $text = str_replace('[dur3]', $this->timeToFullStats($module['log_dur_3']), $text);
+            $text = str_replace('[dur3]', $this->timeToFull($module['log_dur_3']), $text);
         }
         if(preg_match('/\[paceV\]/', $text)) {
-            $text = str_replace('[paceV]', $this->timeToFullStats($module['log_pace1'], true), $text);
+            $text = str_replace('[paceV]', $this->timeToFull($module['log_pace1'], true), $text);
         } else {
-            $text = str_replace('[pace]', $this->timeToFullStats($module['log_pace1']), $text);
+            $text = str_replace('[pace]', $this->timeToFull($module['log_pace1']), $text);
         }
         if(preg_match('/\[pace2V\]/', $text)) {
-            $text = str_replace('[pace2V]', $this->timeToFullStats($module['log_pace2'], true), $text);
+            $text = str_replace('[pace2V]', $this->timeToFull($module['log_pace2'], true), $text);
         } else {
-            $text = str_replace('[pace2]', $this->timeToFullStats($module['log_pace2']), $text);
+            $text = str_replace('[pace2]', $this->timeToFull($module['log_pace2']), $text);
         }
         if(preg_match('/\[paceV\]/', $text)) {
             $text = str_replace('[paceV]', $this->timeToFull($module['log_pace1'], true), $text);
@@ -234,86 +235,56 @@ class Converter {
 
     public function recalculateFront($text, $module)
     {
-//        $text = $this->wrapInFat($text, $module);
-        $text = $this->recalculateCode($text, $module);
-        return $text;
-    }
-
-    public function recalculateBackDiary($text, $module)
-    {
-        $text = $this->recalculateCode($text, $module);
-        return $text;
-    }
-
-    public function recalculateFrontDiary($text, $module)
-    {
         $text = $this->recalculate($text, $module);
         return $text;
     }
 
-
-    public function returnInputsFields(string $text)
+    public function recalculateBack($text, $module)
     {
-        preg_match_all('/(\[[a-z]+[0-9]?+.?\])/', $text, $matches);
-        return $matches[0];
-    }
-
-    protected function wrapInFat($text, $module)
-    {
-        // switch ($module['info']['typename']) {
-        //     case "WK":
-        //         $search = $text;
-        //         break;
-        //     case "RDL":
-        //         $search = "reg. Dauerlauf";
-        //         break;
-        //     case "RDLt":
-        //         $search = "reg. Dauerlauf";
-        //         break;
-        //     default:
-        //         $search = $module['info']['fullname'];
-        //     break;
-        // }
-        // $index = stripos($text, $search);
-        // $result = substr($text, 0, $index+strlen($search));
-        // $text = str_replace($result, "<strong>".$result."</strong>", $text);
-        return $text;
-    }
-
-    protected function recalculateCode($text, $module)
-    {
-        $space = " ";
+        if(!$text) return '';
         $text = str_replace('[loops]', (int)$module['loops'], $text);
-
         $text = str_replace('[txt]', $module['text'], $text);
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
 
-        // distantion
-        $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
-        $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
-        $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
-
-        // time
-        $text = str_replace('[dur1]', $this->timeToFull($module['dur_1']), $text);
-        $text = str_replace('[dur2]', $this->timeToFull($module['dur_2']), $text);
-        $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
-
-
         if(preg_match('/\[dur1V\]/', $text)) {
             $text = str_replace('[dur1V]', $this->timeToFull($module['dur_1'], true), $text);
+        } else {
+            $text = str_replace('[dur1]', $this->timeToFull($module['dur_1']), $text);
         }
         if(preg_match('/\[dur2V\]/', $text)) {
             $text = str_replace('[dur2V]', $this->timeToFull($module['dur_2'], true), $text);
+        } else {
+            $text = str_replace('[dur2]', $this->timeToFull($module['dur_2']), $text);
         }
         if(preg_match('/\[dur3V\]/', $text)) {
             $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
+        } else {
+            $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
         }
         if(preg_match('/\[paceV\]/', $text)) {
             $text = str_replace('[paceV]', $this->timeToFull($module['pace1'], true), $text);
+        } else {
+            $text = str_replace('[pace]', $this->timeToFull($module['pace1']), $text);
         }
         if(preg_match('/\[pace2V\]/', $text)) {
             $text = str_replace('[pace2V]', $this->timeToFull($module['pace2'], true), $text);
+        } else {
+            $text = str_replace('[pace2]', $this->timeToFull($module['pace2']), $text);
         }
+        if(preg_match('/\[paceV\]/', $text)) {
+            $text = str_replace('[paceV]', $this->timeToFull($module['pace1'], true), $text);
+        } else {
+            $text = str_replace('[pace]', $this->timeToFull($module['pace1']), $text);
+        }
+        if(preg_match('/\[pace2V\]/', $text)) {
+            $text = str_replace('[pace2V]', $this->timeToFull($module['pace2'], true), $text);
+        } else {
+            $text = str_replace('[pace2]', $this->timeToFull($module['pace2']), $text);
+        }
+
+        $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
+        $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
+        $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
 
         if(preg_match('/\[\=/', $text)) {
             preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
@@ -326,7 +297,7 @@ class Converter {
                         $unit = $this->getUnit($currentEQ);
                         $currentEQ = $unit['obj'];
 
-                        $currentEQ = str_replace('loops', (int)$module['loops'], $currentEQ);
+                        $currentEQ = str_replace('loops', (int)$module['log_loops'], $currentEQ);
 
                         $currentEQ = str_replace('dis1', $module['dist_1'], $currentEQ);
                         $currentEQ = str_replace('dis2', $module['dist_2'], $currentEQ);
@@ -361,7 +332,14 @@ class Converter {
                 }
             }
         }
+
         return $text;
+    }
+
+    public function returnInputsFields(string $text)
+    {
+        preg_match_all('/(\[[a-z]+[0-9]?+.?\])/', $text, $matches);
+        return $matches[0];
     }
 
     /**
