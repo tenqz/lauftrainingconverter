@@ -36,7 +36,6 @@ class Converter {
         $result[] = ($seconds < 10 ? '0' : '') . $seconds;
 
         $result = implode(':', $result);
-
         return (
             ($result === '00:00' || $result === '00:00:00') ?
                 '' :
@@ -56,7 +55,7 @@ class Converter {
     public function timeToFullStats($seconds, $speed = false, $showUnit = true) :string
     {
         if ($seconds == 0) {
-            return "00:00:00" . self::HOURS;
+            return "00:00:00". " " . self::HOURS;
         }
 
         return $this->timeToFull($seconds, $speed, $showUnit);
@@ -144,19 +143,29 @@ class Converter {
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
 
         if(preg_match('/\[dur1V\]/', $text)) {
-            $text = str_replace('[dur1V]', $this->timeToFull($module['log_dur_1'], true), $text);
+            $text = str_replace('[dur1V]', $this->timeToFullStats($module['log_dur_1'], true), $text);
         } else {
-            $text = str_replace('[dur1]', $this->timeToFull($module['log_dur_1']), $text);
+            $text = str_replace('[dur1]', $this->timeToFullStats($module['log_dur_1']), $text);
         }
         if(preg_match('/\[dur2V\]/', $text)) {
-            $text = str_replace('[dur2V]', $this->timeToFull($module['log_dur_2'], true), $text);
+            $text = str_replace('[dur2V]', $this->timeToFullStats($module['log_dur_2'], true), $text);
         } else {
-            $text = str_replace('[dur2]', $this->timeToFull($module['log_dur_2']), $text);
+            $text = str_replace('[dur2]', $this->timeToFullStats($module['log_dur_2']), $text);
         }
         if(preg_match('/\[dur3V\]/', $text)) {
-            $text = str_replace('[dur3V]', $this->timeToFull($module['log_dur_3'], true), $text);
+            $text = str_replace('[dur3V]', $this->timeToFullStats($module['log_dur_3'], true), $text);
         } else {
-            $text = str_replace('[dur3]', $this->timeToFull($module['log_dur_3']), $text);
+            $text = str_replace('[dur3]', $this->timeToFullStats($module['log_dur_3']), $text);
+        }
+        if(preg_match('/\[paceV\]/', $text)) {
+            $text = str_replace('[paceV]', $this->timeToFullStats($module['log_pace1'], true), $text);
+        } else {
+            $text = str_replace('[pace]', $this->timeToFullStats($module['log_pace1']), $text);
+        }
+        if(preg_match('/\[pace2V\]/', $text)) {
+            $text = str_replace('[pace2V]', $this->timeToFullStats($module['log_pace2'], true), $text);
+        } else {
+            $text = str_replace('[pace2]', $this->timeToFullStats($module['log_pace2']), $text);
         }
 
         $text = str_replace('[dis1]', $this->meterToFull($module['log_dist_1']), $text);
@@ -289,6 +298,12 @@ class Converter {
         if(preg_match('/\[dur3V\]/', $text)) {
             $text = str_replace('[dur3V]', $this->timeToFull($module['dur_3'], true), $text);
         }
+        if(preg_match('/\[paceV\]/', $text)) {
+            $text = str_replace('[paceV]', $this->timeToFull($module['pace1'], true), $text);
+        }
+        if(preg_match('/\[pace2V\]/', $text)) {
+            $text = str_replace('[pace2V]', $this->timeToFull($module['pace2'], true), $text);
+        }
 
         if(preg_match('/\[\=/', $text)) {
             preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
@@ -337,5 +352,103 @@ class Converter {
             }
         }
         return $text;
+    }
+
+    /**
+     * Array $data must to contain keys:
+     * array(
+     *      'dist_1',
+     *      'dist_2',
+     *      'dist_3',
+     *      'dur_1',
+     *      'loops',
+     *      'rztime',
+     *      'pace1',
+     *      'pace2',
+     *      'typename'
+     * )
+     *
+     * Array $modifier must to contain keys:
+     * array(
+     *      'factor',
+     *      'round',
+     *      'children' => 'not require'
+     * )
+     * @param array $modifier
+     * @param array $data
+     * @param array $modifier2
+     * @return array seconds/km
+     */
+    public function getPace(array $modifier, array $data, $modifier2 = []) {
+        $pace1 = $data['pace1'] / 1000; //seconds/km to seconds/meter
+        $pace2 = $data['pace2'] / 1000;
+        $totalPace1 = 0;
+        $totalPace2 = 0;
+
+        if($data['dist_1'] && $data['dur_1']) {
+            $average = $data['dur_1'] / $data['dist_1'];
+
+            if($data['typename'] === 'TWK' || $data['typename'] === 'TWKi' && $modifier2) {
+                if($data['dist_2'] && $data['dist_3'] && ($pace1 || $pace2)) {
+                    $koif = ceil($data['dist_1'] / ($data['dist_2'] + $data['dist_3']));
+                    $distancePace1 = $koif;
+                    $distancePace2 = $koif;
+                    $rest = $data['dist_1'] - (($data['dist_2'] + $data['dist_3']) * $koif);
+                    $distancePace1 += $rest / $data['dist_2'];
+                    if($rest > $data['dist_2']) {
+                        $distancePace2 += ($rest - $data['dist_2']) / $data['dist_3'];
+                    }
+                    if($pace1) {
+                        $distance1 = $distancePace1 * $data['dist_2'];
+                        $pace2 = ($data['dur_1'] - ($distance1 * $pace1)) / ($data['dist_1'] - $distance1);
+                    } else {
+                        $distance2 = $distancePace2 * $data['dist_3'];
+                        $pace1 = ($data['dur_1'] - ($distance2 * $pace2)) / ($data['dist_1'] - $distance2);
+                    }
+                }
+            } elseif(($data['typename'] === 'CSD' || $data['typename'] === 'CSDi') && $modifier2) {
+                if($pace1 || $pace2) {
+                    if($pace1) $pace2 = $average * 2 - $pace1;
+                    if($pace2) $pace1 = $average * 2 - $pace2;
+                } else {
+                    $totalPace1 = ($average * 1000) + 30;
+                    $totalPace2 = ($average * 1000) - 30;
+                }
+            } elseif(!$pace1) {
+                $pace1 = $average;
+            }
+        } else {
+            if(!$data['rztime']) $data['rztime'] = 2700; //45 min
+            $alldistance = (int)$data['dist_1'] * (int)$data['loops'];
+
+            if(!$pace1) {
+                $factor = $modifier['factor'];
+                $round = $modifier['round'];
+                if (isset($modifier['children']) && $alldistance > 0) {
+                    foreach ($modifier['children'] as $minDistance => $child) {
+                        if ($alldistance >= $minDistance) {
+                            $factor = $child['factor'];
+                            $round = $child['round'];
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                $totalPace1 = round(($data['rztime'] * $factor) / $round) * $round;
+            }
+            if(!$pace2 && $modifier2) {
+                $factor = $modifier2['factor'];
+                $round = $modifier2['round'];
+                $totalPace2 = round(($data['rztime'] * $factor) / $round) * $round;
+            }
+        }
+
+        if(!$totalPace1) $totalPace1 = $pace1 * 1000;
+        if(!$totalPace2) $totalPace2 = $pace2 * 1000;
+
+        return [
+            'pace1' => (int)$totalPace1,
+            'pace2' => (int)$totalPace2
+        ];
     }
 }
