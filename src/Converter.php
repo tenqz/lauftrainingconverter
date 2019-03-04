@@ -241,9 +241,14 @@ class Converter {
     public function recalculateBack($text, $module)
     {
         if(!$text) return '';
+
         $text = str_replace('[loops]', (int)$module['loops'], $text);
         $text = str_replace('[txt]', $module['text'], $text);
         $text = str_replace('[video]', (isset($this->moduleVideos[$module['video']]) ? $this->moduleVideos[$module['video']]['name'] : $module['video']), $text);
+        
+        $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
+        $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
+        $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
 
         if(preg_match('/\[dur1V\]/', $text)) {
             $text = str_replace('[dur1V]', $this->timeToFull($module['dur_1'], true), $text);
@@ -260,6 +265,7 @@ class Converter {
         } else {
             $text = str_replace('[dur3]', $this->timeToFull($module['dur_3']), $text);
         }
+        
         if(preg_match('/\[paceV\]/', $text)) {
             $text = str_replace('[paceV]', $this->timeToFull($module['pace1'], true), $text);
         } else {
@@ -280,11 +286,7 @@ class Converter {
         } else {
             $text = str_replace('[pace2]', $this->timeToFull($module['pace2']), $text);
         }
-
-        $text = str_replace('[dis1]', $this->meterToFull($module['dist_1']), $text);
-        $text = str_replace('[dis2]', $this->meterToFull($module['dist_2']), $text);
-        $text = str_replace('[dis3]', $this->meterToFull($module['dist_3']), $text);
-
+        
         if(preg_match('/\[\=/', $text)) {
             preg_match_all('/\[\=(.*?)\]/', $text, $equation, PREG_SET_ORDER);
             if($equation) {
