@@ -408,7 +408,7 @@ class Converter {
             }
         } else {
             if(!$data['rztime']) $data['rztime'] = 2700; //45 min
-            $alldistance = (int)$data['dist_1'] * (int)$data['loops'];
+            $alldistance = (int)$data['dist_1'];
 
             if(!$pace1) {
                 $factor = $modifier['factor'];
