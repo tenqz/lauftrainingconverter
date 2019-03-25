@@ -76,7 +76,7 @@ class Converter {
 
     public function meterToFull(int $meters, $onlykm = false) : string
     {
-        if($meters > 1000 || $onlykm) {
+        if($meters >= 1000 || $onlykm) {
             $result = number_format (($meters/1000), 1, ',', ' ')
                  ." ". (!$onlykm ? self::KMETERS : '');
         } else {
