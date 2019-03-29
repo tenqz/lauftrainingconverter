@@ -10,6 +10,8 @@ class Converter {
     const METERS_SECOND = 'min/km';
     const SECONDS = 's';
     const HOURS = 'h';
+    const GENDER_MAN = 1;
+    const GENDER_WOMAN = 2;
 
     protected $moduleVideos = [];
 
@@ -439,5 +441,28 @@ class Converter {
             'pace1' => (int)$totalPace1,
             'pace2' => (int)$totalPace2
         ];
+    }
+
+    public function calculateCalories(int $seconds, $multiplier, int $gender, $weight)
+    {
+        $calories = 0;
+
+        $genderMultiply = 0;
+        switch ($gender) {
+            case 1:
+                $genderMultiply = 0.0167;
+                break;
+            case 2:
+                $genderMultiply = 0.015;
+                break;
+        }
+
+        $trainingMinute = floor($seconds / 60);
+
+        if ($weight ) {
+            $calories = $weight * $genderMultiply * $multiplier * $trainingMinute;
+        }
+
+        return $calories;
     }
 }
