@@ -443,11 +443,11 @@ class Converter {
         ];
     }
 
-    public function calculateCalories(int $seconds, $multiplier, int $gender, $weight)
+    public function calculateCalories(int $seconds, $multiplier, $gender, $weight)
     {
         $calories = 0;
 
-        $genderMultiply = 0;
+        $genderMultiply = 0.0155;//Average
         switch ($gender) {
             case 1:
                 $genderMultiply = 0.0167;
