@@ -457,10 +457,10 @@ class Converter {
                 break;
         }
 
-        $trainingMinute = floor($seconds / 60);
+        $trainingMinute = $seconds / 60;
 
         if ($weight ) {
-            $calories = $weight * $genderMultiply * $multiplier * $trainingMinute;
+            $calories = floor($weight * $genderMultiply * $multiplier * $trainingMinute * 100) / 100;
         }
 
         return $calories;
